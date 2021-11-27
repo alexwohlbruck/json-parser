@@ -146,7 +146,11 @@ parseObject :: [JToken] -> [(String, JValue)]
 parseObject [] = error "Parser error: empty token list."
 parseObject (LeftBrace : xs) = parseObject xs
 parseObject (RightBrace : xs) = []
-parseObject (StringToken s : Colon : x : xs) = (s, parser ([x])) : parseObject (xs)
+parseObject (RightBracket : xs) = []
+parseObject (Comma : xs) = parseObject xs
+parseObject (StringToken s : Colon : LeftBrace : xs) = (s, JObject (parseObject xs)) : parseObject xs
+parseObject (StringToken s : Colon : LeftBracket : xs) = (s, JArray (parseArray xs)) : parseObject xs
+parseObject (StringToken s : Colon : x : xs) = (s, parser ([x])) : parseObject xs
 parseObject (x : _) = error ("Parser error: " ++ show x ++ " is not a valid key.")
 
 parseArray :: [JToken] -> [JValue]
@@ -171,14 +175,15 @@ main :: IO ()
 main = do
   args <- getArgs
   let (infile, outfile) = getFiles args
-  putStrLn ("Input file: " ++ infile)
-  putStrLn ("Output file: " ++ outfile)
 
   file <- openFile infile ReadMode
   text <- hGetContents file
 
-  let parsed = show (parse text)
-  print text
+  let lexed = lexer text
+  print (show lexed)
+
+  let parsed = show (parser lexed)
+  print parsed
 
   writeFile outfile parsed
   hClose file

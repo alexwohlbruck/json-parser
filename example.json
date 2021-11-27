@@ -1,4 +1,8 @@
 {
-  "hello": "world",
-  "test": "test"
+  "b": {
+    "c": true
+  },
+  "a": {
+    "c": false
+  }
 }
