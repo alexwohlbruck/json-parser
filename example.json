@@ -1,8 +1,6 @@
 {
+  "c": false,
   "b": {
-    "c": true
-  },
-  "a": {
-    "c": false
+    "c": 1
   }
 }

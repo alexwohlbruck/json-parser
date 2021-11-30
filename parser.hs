@@ -104,7 +104,7 @@ classify ('t' : 'r' : 'u' : 'e' : xs) = BoolToken True
 classify ('f' : 'a' : 'l' : 's' : 'e' : xs) = BoolToken False
 classify ('n' : xs) = NullToken
 classify ('-' : xs) = NumberToken (numberify xs)
-classify xs = NumberToken (numberify xs)
+classify xs = NumberToken (numberify xs) -- TODO: Only match numeric inputs, catch other characters as validation error
 
 numberify :: String -> Integer
 numberify [] = error "Token error numberify: empty string."
@@ -129,6 +129,7 @@ lexer s = map classify (words (preproc False s))
 
 --- Parsing ---
 
+-- Parse a single token
 parser :: [JToken] -> JValue
 parser [] = error "Parser error: empty token list."
 parser (LeftBrace : xs) = JObject (parseObject xs)
@@ -142,22 +143,19 @@ parser (RightBracket : _) = error "Parser error: right bracket without left brac
 parser (Comma : _) = error "Parser error: comma without left brace or left bracket."
 parser (Colon : _) = error "Parser error: colon without left brace or left bracket."
 
+-- Begin recursively parsing the json object
 parseObject :: [JToken] -> [(String, JValue)]
 parseObject [] = error "Parser error: empty token list."
 parseObject (LeftBrace : xs) = parseObject xs
-parseObject (RightBrace : xs) = []
-parseObject (RightBracket : xs) = []
-parseObject (Comma : xs) = parseObject xs
-parseObject (StringToken s : Colon : LeftBrace : xs) = (s, JObject (parseObject xs)) : parseObject xs
-parseObject (StringToken s : Colon : LeftBracket : xs) = (s, JArray (parseArray xs)) : parseObject xs
-parseObject (StringToken s : Colon : x : xs) = (s, parser ([x])) : parseObject xs
-parseObject (x : _) = error ("Parser error: " ++ show x ++ " is not a valid key.")
+parseObject (RightBrace : _) = []
+parseObject (StringToken s : Colon : xs) = (s, parser xs) : parseObject (takeWhile (/= RightBrace) xs)
+parseObject (x : _) = error ("Parser error: " ++ show x ++ " is not a valid token.")
 
 parseArray :: [JToken] -> [JValue]
 parseArray [] = error "Parser error: empty token list."
 parseArray (LeftBracket : xs) = parseArray xs
-parseArray (RightBracket : xs) = []
-parseArray (x : xs) = parser (x : xs) : parseArray xs
+parseArray (RightBracket : _) = []
+parseArray (x : xs) = parser (x : xs) : parseArray (dropWhile (/= RightBracket) xs)
 
 parse :: String -> JValue
 parse s = parser (lexer s)
@@ -166,10 +164,10 @@ parse s = parser (lexer s)
 --- User IO prompts ---
 
 getFiles :: [String] -> (String, String)
-getFiles [] = error "Error: No files provided." -- no files
-getFiles [i] = error "Error: No output file provided." -- one file
-getFiles [i, o] = (i, o) -- two files
-getFiles (i : o : xs) = error "Error: Too many files provided." -- N files
+getFiles [] = error "Error: No files provided."
+getFiles [i] = error "Error: No output file provided."
+getFiles [i, o] = (i, o)
+getFiles (i : o : xs) = error "Error: Too many files provided."
 
 main :: IO ()
 main = do
