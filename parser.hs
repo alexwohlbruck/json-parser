@@ -79,6 +79,7 @@ data JToken
   deriving (Eq, Show)
 
 
+-- TODO: Use non-space character for separation. This kills my strings that have spaces
 preproc :: Bool -> String -> String
 preproc _ "" = "" -- Base Case
 preproc False ('"' : xs) = ' ' : '"' : preproc True xs -- Double quotes already inside literal mode
@@ -129,11 +130,64 @@ lexer s = map classify (words (preproc False s))
 
 --- Parsing ---
 
+-- takeWhile implementation that counts balanced brackets/braces
+-- Keep elements of the array until the same nest-level right bracket is found
+-- ex. [LeftBrace, LeftBrace, BoolToken True, RightBrace, RightBrace] -> [LeftBrace, BoolToken True, RightBrace]
+--     {{true}} -> {true}
+--     [LeftBrace, BoolToken True, RightBrace, LeftBrace, RightBrace] -> [BoolToken True]
+--     {true}{} -> true
+takeWhileBalanced :: [JToken] -> [JToken]
+takeWhileBalanced [] = []
+takeWhileBalanced (LeftBrace : xs) = takeWhileBrace 1 xs
+takeWhileBalanced (LeftBracket : xs) = takeWhileBracket 1 xs
+takeWhileBalanced xs = xs
+
+takeWhileBrace :: Integer -> [JToken] -> [JToken]
+takeWhileBrace n [] = []
+takeWhileBrace n (LeftBrace : xs) = LeftBrace : takeWhileBrace (n + 1) xs
+takeWhileBrace 1 (RightBrace : xs) = []
+takeWhileBrace n (RightBrace : xs) = RightBrace : takeWhileBrace (n - 1) xs
+takeWhileBrace n (x : xs) = x : takeWhileBrace n xs
+
+takeWhileBracket :: Integer -> [JToken] -> [JToken]
+takeWhileBracket 0 xs = []
+takeWhileBracket n [] = []
+takeWhileBracket n (LeftBracket : xs) = LeftBracket : takeWhileBracket (n + 1) xs
+takeWhileBracket 1 (RightBracket : xs) = []
+takeWhileBracket n (RightBracket : xs) = RightBracket : takeWhileBracket (n - 1) xs
+takeWhileBracket n (x : xs) = x : takeWhileBracket n xs
+
+-- Do the same for dropWhile
+dropWhileBalanced :: [JToken] -> [JToken]
+dropWhileBalanced [] = []
+dropWhileBalanced (LeftBrace : xs) = dropWhileBrace 1 xs
+dropWhileBalanced (LeftBracket : xs) = dropWhileBracket 1 xs
+dropWhileBalanced xs = xs
+
+dropWhileBrace :: Integer -> [JToken] -> [JToken]
+dropWhileBrace 0 xs = xs
+dropWhileBrace n [] = []
+dropWhileBrace n (LeftBrace : xs) = dropWhileBrace (n + 1) xs
+dropWhileBrace 1 (RightBrace : xs) = xs
+dropWhileBrace n (RightBrace : xs) = dropWhileBrace (n - 1) xs
+dropWhileBrace n (x : xs) = dropWhileBrace n xs
+
+
+dropWhileBracket :: Integer -> [JToken] -> [JToken]
+dropWhileBracket 0 xs = xs
+dropWhileBracket n [] = []
+dropWhileBracket n (LeftBracket : xs) = dropWhileBracket (n + 1) xs
+dropWhileBracket 1 (RightBracket : xs) = xs
+dropWhileBracket n (RightBracket : xs) = dropWhileBracket (n - 1) xs
+dropWhileBracket n (x : xs) = dropWhileBracket n xs
+
+
+
 -- Parse a single token
 parser :: [JToken] -> JValue
 parser [] = error "Parser error: empty token list."
-parser (LeftBrace : xs) = JObject (parseObject xs)
-parser (LeftBracket : xs) = JArray (parseArray xs)
+parser (LeftBrace : xs) = JObject (parseObject (takeWhileBalanced (LeftBrace:xs)))
+parser (LeftBracket : xs) = JArray (parseArray (takeWhileBalanced (LeftBracket:xs)))
 parser (StringToken s : xs) = JString s
 parser (NumberToken n : xs) = JNumber n
 parser (BoolToken b : xs) = JBool b
@@ -143,12 +197,16 @@ parser (RightBracket : _) = error "Parser error: right bracket without left brac
 parser (Comma : _) = error "Parser error: comma without left brace or left bracket."
 parser (Colon : _) = error "Parser error: colon without left brace or left bracket."
 
+
 -- Begin recursively parsing the json object
 parseObject :: [JToken] -> [(String, JValue)]
-parseObject [] = error "Parser error: empty token list."
-parseObject (LeftBrace : xs) = parseObject xs
-parseObject (RightBrace : _) = []
-parseObject (StringToken s : Colon : xs) = (s, parser xs) : parseObject (takeWhile (/= RightBrace) xs)
+parseObject [] = []
+parseObject (Comma : xs) = parseObject xs
+parseObject (LeftBrace : xs) = parseObject (takeWhileBalanced (LeftBrace:xs))
+parseObject (StringToken s : Colon : LeftBrace : xs) = (s, JObject (parseObject (takeWhileBalanced (LeftBrace:xs)))) : parseObject (dropWhileBalanced (LeftBrace:xs))
+parseObject (StringToken s : Colon : LeftBracket : xs) = (s, JArray (parseArray (takeWhileBalanced (LeftBracket:xs)))) : parseObject (dropWhileBalanced (LeftBracket:xs))
+parseObject (StringToken s : Colon : x : xs) = (s, parser [x]) : parseObject xs
+parseObject (RightBrace : _) = error "Parser error: right brace without left brace."
 parseObject (x : _) = error ("Parser error: " ++ show x ++ " is not a valid token.")
 
 parseArray :: [JToken] -> [JValue]
