@@ -172,7 +172,6 @@ dropWhileBrace 1 (RightBrace : xs) = xs
 dropWhileBrace n (RightBrace : xs) = dropWhileBrace (n - 1) xs
 dropWhileBrace n (x : xs) = dropWhileBrace n xs
 
-
 dropWhileBracket :: Integer -> [JToken] -> [JToken]
 dropWhileBracket 0 xs = xs
 dropWhileBracket n [] = []
@@ -180,7 +179,6 @@ dropWhileBracket n (LeftBracket : xs) = dropWhileBracket (n + 1) xs
 dropWhileBracket 1 (RightBracket : xs) = xs
 dropWhileBracket n (RightBracket : xs) = dropWhileBracket (n - 1) xs
 dropWhileBracket n (x : xs) = dropWhileBracket n xs
-
 
 
 -- Parse a single token
@@ -210,10 +208,12 @@ parseObject (RightBrace : _) = error "Parser error: right brace without left bra
 parseObject (x : _) = error ("Parser error: " ++ show x ++ " is not a valid token.")
 
 parseArray :: [JToken] -> [JValue]
-parseArray [] = error "Parser error: empty token list."
-parseArray (LeftBracket : xs) = parseArray xs
-parseArray (RightBracket : _) = []
-parseArray (x : xs) = parser (x : xs) : parseArray (dropWhile (/= RightBracket) xs)
+parseArray [] = []
+parseArray (Comma : xs) = parseArray xs
+parseArray (LeftBracket : xs) = parseArray (takeWhileBalanced (LeftBracket:xs))
+parseArray (RightBracket : _) = error "Parser error: right bracket without left bracket."
+parseArray (x : xs) = parser [x] : parseArray xs
+
 
 parse :: String -> JValue
 parse s = parser (lexer s)

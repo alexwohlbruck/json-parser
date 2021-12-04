@@ -1,7 +1,18 @@
 {
-  "a": false,
-  "b": {
-    "c": 1
-  },
-  "d": "hello"
+  "name": "Alex",
+  "age": 21,
+  "skills": [
+    {
+      "name": "Javascript",
+      "level": 10
+    },
+    {
+      "name": "Python",
+      "level": 8
+    },
+    {
+      "name": "Haskell",
+      "level": 5
+    }
+  ]
 }
