@@ -1,6 +1,16 @@
 {
-  "message": "hello world",
   "parent": {
-    "child": 1
-  }
+    "child": 1,
+    "test": true,
+    "subarray": [
+      "hello",
+      "world",
+      "Alex Wohlbruck"
+    ]
+  },
+  "array": [
+    1,
+    2,
+    3
+  ]
 }

@@ -236,29 +236,39 @@ parse s = parser (lexer s)
 
 -- Format as YAML with indentation
 
-yamlPrint :: JValue -> String
-yamlPrint JNull = "null"
-yamlPrint (JBool b) = show b
-yamlPrint (JString s) = "\"" ++ s ++ "\""
-yamlPrint (JNumber n) = show n
-yamlPrint (JObject o) = (yamlPrintObject (0, o))
-yamlPrint (JArray a) = "- " ++ (yamlPrintArray (0, a)) ++ "\n"
+-- https://stackoverflow.com/questions/36746690/removing-direct-duplicates-on-a-list
+compress :: String -> String
+compress [] = []
+compress [x] = [x]
+compress (x:x2:xs) | (x == x2) && (x == '\n')   = compress (x2:xs)
+                   | otherwise = x : compress (x2:xs)
 
-yamlPrintObject :: (Int, [(String, JValue)]) -> String
-yamlPrintObject (n, []) = ""
-yamlPrintObject (n, (x:xs)) = (yamlPrintString x) ++ "\n" ++ (yamlPrintObject (n, xs))
+yaml :: JValue -> String
+yaml o = compress (yamlPrint 0 o)
 
-yamlPrintArray :: (Int, [JValue]) -> String
-yamlPrintArray (n, []) = ""
-yamlPrintArray (n, (x:xs)) = (yamlPrint x) ++ "\n" ++ (yamlPrintArray (n, xs))
+yamlPrint :: Int -> JValue -> String
+yamlPrint n JNull = "null"
+yamlPrint n (JBool b) = show b
+yamlPrint n (JString s) = "\"" ++ s ++ "\""
+yamlPrint n (JNumber num) = show num
+yamlPrint n (JObject o) = (yamlPrintObject False n o)
+yamlPrint n (JArray a) = (yamlPrintArray n a)
 
-yamlPrintString :: (String, JValue) -> String
-yamlPrintString (s, x) = s ++ ": " ++ (yamlPrint x)
+yamlPrintObject :: Bool -> Int -> [(String, JValue)] -> String
+yamlPrintObject _ _ [] = ""
+yamlPrintObject False n ((s, JObject o) : xs) = (indent n) ++ s ++ ":\n" ++ (yamlPrintObject False (n + 1) o) ++ (yamlPrintObject False n xs)
+yamlPrintObject False n ((s, v) : xs) = (indent n) ++ s ++ ": " ++ (yamlPrint (n+1) v) ++ "\n" ++ (yamlPrintObject False (n) xs)
+yamlPrintObject True n ((s, JObject o) : xs) = " " ++ s ++ ":\n" ++ (yamlPrintObject False (n + 1) o) ++ (yamlPrintObject False n xs)
+yamlPrintObject True n ((s, v) : xs) = " " ++ s ++ ": " ++ (yamlPrint (n+1) v) ++ "\n" ++ (yamlPrintObject False (n) xs)
+
+yamlPrintArray :: Int -> [JValue] -> String
+yamlPrintArray _ [] = ""
+yamlPrintArray n (JObject o : xs) = "\n" ++ (indent n) ++ "-" ++ (yamlPrintObject True (n + 1) o) ++ (yamlPrintArray n xs)
+yamlPrintArray n (v : xs) = "\n" ++ (indent n) ++ "- " ++ (yamlPrint (n+1) v) ++ (yamlPrintArray n xs)
 
 -- Indent a string by n spaces
 indent :: Int -> String
 indent n = replicate n '\t'
-
 
 
 --- User IO prompts ---
@@ -278,7 +288,7 @@ main = do
   text <- hGetContents file
 
   let parsed = parse text
-  let output = yamlPrint parsed
+  let output = yaml parsed
 
   print (output)
 

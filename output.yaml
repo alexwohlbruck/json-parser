@@ -1,3 +1,19 @@
-message: "hello world"
-parent: child: 1
-
+name: "Alex"
+age: 21
+skills: 
+	- name: "Javascript"
+		level: 10
+		bool: True
+	- name: "Python"
+		level: 8
+		bool: True
+	- name: "Haskell"
+		level: 5
+		bool: True
+isActive: True
+currentProject:
+	name: "Haskell JSON parser"
+	lanuages: 
+		- "Haskell"
+		- "JSON"
+		- "Javascript"
