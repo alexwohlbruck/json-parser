@@ -3,6 +3,7 @@ import System.IO (IOMode (ReadMode), hGetContents, hClose, openFile)
 import Control.Monad (when)
 
 import Data.List (intercalate)
+import Data.List.Split (splitOn)
 import Data.Char (isDigit, isHexDigit, isSpace, chr, ord, digitToInt)
 import Numeric (showHex)
 
@@ -79,18 +80,26 @@ data JToken
   deriving (Eq, Show)
 
 
--- TODO: Use non-space character for separation. This kills my strings that have spaces
+delimiter = chr 0x1F -- ASCII unit separator
+
+isWhiteSpace :: Char -> Bool
+isWhiteSpace c = c == ' ' || c == '\t' || c == '\n' || c == '\r'
+
 preproc :: Bool -> String -> String
 preproc _ "" = "" -- Base Case
-preproc False ('"' : xs) = ' ' : '"' : preproc True xs -- Double quotes already inside literal mode
-preproc True ('"' : xs) = '"' : ' ' : preproc False xs -- Double quotes not inside literal mode
-preproc b ('[' : xs) = ' ' : '[' : ' ' : preproc b xs -- Left bracket
-preproc b (']' : xs) = ' ' : ']' : ' ' : preproc b xs -- Right bracket
-preproc b ('{' : xs) = ' ' : '{' : ' ' : preproc b xs -- Left brace
-preproc b ('}' : xs) = ' ' : '}' : ' ' : preproc b xs -- Right brace
-preproc b (',' : xs) = ' ' : ',' : ' ' : preproc b xs -- Comma
-preproc b (':' : xs) = ' ' : ':' : ' ' : preproc b xs -- Colon
-preproc b (x : xs) = x : preproc b xs -- All other characters
+preproc True (' ' : xs) = ' ' : preproc True xs -- Space
+preproc False ('"' : xs) = delimiter : '"' : preproc True xs -- Double quotes already inside literal mode
+preproc True ('"' : xs) = '"' : delimiter : preproc False xs -- Double quotes not inside literal mode
+preproc b ('[' : xs) = delimiter : '[' : delimiter : preproc b xs -- Left bracket
+preproc b (']' : xs) = delimiter : ']' : delimiter : preproc b xs -- Right bracket
+preproc b ('{' : xs) = delimiter : '{' : delimiter : preproc b xs -- Left brace
+preproc b ('}' : xs) = delimiter : '}' : delimiter : preproc b xs -- Right brace
+preproc b (',' : xs) = delimiter : ',' : delimiter : preproc b xs -- Comma
+preproc b (':' : xs) = delimiter : ':' : delimiter : preproc b xs -- Colon
+preproc b (x : xs)
+  | isWhiteSpace x = preproc b xs
+  | otherwise = x : preproc b xs -- All other characters
+
 
 classify :: String -> JToken
 classify [] = error "Token error classify: empty string."
@@ -124,8 +133,12 @@ stringify ('\\' : 'r' : xs) = '\r' : stringify xs
 stringify ('\\' : 't' : xs) = '\t' : stringify xs
 stringify (x : xs) = x : stringify xs
 
+split :: Char -> String -> [String]
+split _ [] = []
+split c s = let (x, y) = break (== c) s in x : split c (drop 1 y)
+
 lexer :: String -> [JToken]
-lexer s = map classify (words (preproc False s))
+lexer s = map classify (filter (not . null) (split delimiter (preproc False s)))
 
 
 --- Parsing ---
@@ -211,6 +224,7 @@ parseArray :: [JToken] -> [JValue]
 parseArray [] = []
 parseArray (Comma : xs) = parseArray xs
 parseArray (LeftBracket : xs) = parseArray (takeWhileBalanced (LeftBracket:xs))
+parseArray (LeftBrace : xs) = JObject(parseObject (takeWhileBalanced (LeftBrace:xs))) : parseArray (dropWhileBalanced (LeftBrace:xs))
 parseArray (RightBracket : _) = error "Parser error: right bracket without left bracket."
 parseArray (x : xs) = parser [x] : parseArray xs
 
