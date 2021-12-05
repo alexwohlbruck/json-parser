@@ -1,33 +1,33 @@
-name: "Alex"
+name: "Alex Wohlbruck"
 age: 21
 skills: 
-	- name: "Javascript"
-		level: 10
-		bool: true
-		tags: 
-			- "js"
-			- "javascript"
-	- name: "Python"
-		level: 8
-		bool: true
-		tags: 
-			- "python"
-			- "python3"
-	- name: "Haskell"
-		level: 5
-		bool: true
-		tags: 
-			- "haskell"
+  - name: "Javascript"
+    level: 10
+    bool: true
+    tags: 
+      - "js"
+      - "javascript"
+  - name: "Python"
+    level: 8
+    bool: true
+    tags: 
+      - "python"
+      - "python3"
+  - name: "Haskell"
+    level: 5
+    bool: true
+    tags: 
+      - "haskell"
 isActive: true
 currentProject:
-	name: "Haskell JSON parser"
-	lanuages: 
-		- "Haskell"
-		- "JSON"
-		- "Javascript"
-	numberList: 
-		- 1
-		- 2
-		- 3
-		- 4
-		- 5
+  name: "Haskell JSON parser"
+  lanuages: 
+    - "Haskell"
+    - "JSON"
+    - "Javascript"
+  numberList: 
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5

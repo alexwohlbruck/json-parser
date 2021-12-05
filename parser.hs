@@ -266,9 +266,9 @@ yamlPrintArray _ [] = ""
 yamlPrintArray n (JObject o : xs) = "\n" ++ (indent n) ++ "-" ++ (yamlPrintObject True (n + 1) o) ++ (yamlPrintArray n xs)
 yamlPrintArray n (v : xs) = "\n" ++ (indent n) ++ "- " ++ (yamlPrint (n+1) v) ++ (yamlPrintArray n xs)
 
--- Indent a string by n spaces
+-- Indent a string by n*2 spaces
 indent :: Int -> String
-indent n = replicate n '\t'
+indent n = replicate (n*2) ' '
 
 
 --- User IO prompts ---
