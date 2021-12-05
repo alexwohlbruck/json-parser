@@ -5,17 +5,20 @@
     {
       "name": "Javascript",
       "level": 10,
-      "bool": true
+      "bool": true,
+      "tags": ["js", "javascript"]
     },
     {
       "name": "Python",
       "level": 8,
-      "bool": true
+      "bool": true,
+      "tags": ["python", "python3"]
     },
     {
       "name": "Haskell",
       "level": 5,
-      "bool": true
+      "bool": true,
+      "tags": ["haskell"]
     }
   ],
   "isActive": true,
@@ -25,6 +28,7 @@
       "Haskell",
       "JSON",
       "Javascript"
-    ]
+    ],
+    "numberList": [1,2,3,4,5]
   }
 }

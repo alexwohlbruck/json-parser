@@ -4,7 +4,7 @@ import Control.Monad (when)
 
 import Data.List (intercalate)
 import Data.List.Split (splitOn)
-import Data.Char (isDigit, isHexDigit, isSpace, chr, ord, digitToInt)
+import Data.Char (isDigit, isHexDigit, isSpace, chr, ord, digitToInt, toLower)
 import Numeric (showHex)
 
 
@@ -248,7 +248,7 @@ yaml o = compress (yamlPrint 0 o)
 
 yamlPrint :: Int -> JValue -> String
 yamlPrint n JNull = "null"
-yamlPrint n (JBool b) = show b
+yamlPrint n (JBool b) = map toLower (show b)
 yamlPrint n (JString s) = "\"" ++ s ++ "\""
 yamlPrint n (JNumber num) = show num
 yamlPrint n (JObject o) = (yamlPrintObject False n o)
