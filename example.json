@@ -1,7 +1,6 @@
 {
-  "a": 1,
-  "b": {
-    "c": ["hello world", false],
-    "d": null
+  "message": "hello world",
+  "parent": {
+    "child": 1
   }
 }

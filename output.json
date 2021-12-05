@@ -1,10 +1,27 @@
 {
-  "a": 1,
-  "b": {
-    "c": [
-      "hello world",
-      false
-    ],
-    "d": null
-  }
+name : "Alex",
+age : 21,
+skills : [
+{
+name : "Javascript",
+level : 10,
+},
+{
+name : "Python",
+level : 8,
+},
+{
+name : "Haskell",
+level : 5,
+},
+],
+isActive : True,
+currentProject : {
+name : "Haskell JSON parser",
+lanuages : [
+"Haskell",
+"JSON",
+"Javascript",
+],
+},
 }

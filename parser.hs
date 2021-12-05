@@ -62,7 +62,6 @@ showJSONChar c = case c of
 testObj = JObject[("a", JNumber 1), ("b", JArray [JBool False, JString "Hello world"])]
 
 
-
 --- Lexical analysis ---
 
 -- Token types
@@ -233,6 +232,35 @@ parse :: String -> JValue
 parse s = parser (lexer s)
 
 
+--- Pretty printing ---
+
+-- Format as YAML with indentation
+
+yamlPrint :: JValue -> String
+yamlPrint JNull = "null"
+yamlPrint (JBool b) = show b
+yamlPrint (JString s) = "\"" ++ s ++ "\""
+yamlPrint (JNumber n) = show n
+yamlPrint (JObject o) = (yamlPrintObject (0, o))
+yamlPrint (JArray a) = "- " ++ (yamlPrintArray (0, a)) ++ "\n"
+
+yamlPrintObject :: (Int, [(String, JValue)]) -> String
+yamlPrintObject (n, []) = ""
+yamlPrintObject (n, (x:xs)) = (yamlPrintString x) ++ "\n" ++ (yamlPrintObject (n, xs))
+
+yamlPrintArray :: (Int, [JValue]) -> String
+yamlPrintArray (n, []) = ""
+yamlPrintArray (n, (x:xs)) = (yamlPrint x) ++ "\n" ++ (yamlPrintArray (n, xs))
+
+yamlPrintString :: (String, JValue) -> String
+yamlPrintString (s, x) = s ++ ": " ++ (yamlPrint x)
+
+-- Indent a string by n spaces
+indent :: Int -> String
+indent n = replicate n '\t'
+
+
+
 --- User IO prompts ---
 
 getFiles :: [String] -> (String, String)
@@ -249,11 +277,10 @@ main = do
   file <- openFile infile ReadMode
   text <- hGetContents file
 
-  let lexed = lexer text
-  print (show lexed)
+  let parsed = parse text
+  let output = yamlPrint parsed
 
-  let parsed = show (parser lexed)
-  print parsed
+  print (output)
 
-  writeFile outfile parsed
+  writeFile outfile output
   hClose file
