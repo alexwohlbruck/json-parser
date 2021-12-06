@@ -98,7 +98,7 @@ For those who are following the code, the code is structured as follows:
   - #### `split`
     The split function takes a string and splits it by the delimiter.
 
-  - ### `classify`
+  - #### `classify`
     Here we take our individual token strings and convert them into JToken values.
 
   - #### `numberify`
