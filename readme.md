@@ -17,7 +17,7 @@ ghc parser.hs
 
 2. Run the program, passing the input and output file names
 ```bash
-./parser input_file.json output_file.yaml
+./parser example.json output.yaml
 ```
 
 ## Code structure
@@ -114,3 +114,23 @@ This was a challenging project for me, but I did learn a lot in the process. A l
 
 - The last tricky part was pretty printing the YAML string from my internal data representation. I assumed this would be a pretty easy task, until I found myself yet again in recursion hell. My newline and tab chararacters were all wrong for a number of iterations until I finally found the right sequence of strings to combine. I am left with a few really ugly print functions that appear to be a submission in an esoteric programming contest, but they do work well lol.
 
+## Notes
+
+This parser is not a complete implementation of the JSON specification. For example, it doesn't handle comments, decimal numbers, or exponents. If I were to work on this project further, I think those are some things that I should figure out. It would also be neat if I could track the line numbers when a parsing error occurs.
+
+Doing this project I have learned a great deal about Haskell itself and the general theory of lanugage parsing, which is something I have never tried before.
+
+# Sources
+
+Language parsing from scratch using Haskell:
+https://abhinavsarkar.net/posts/json-parsing-from-scratch-in-haskell/
+
+This guy made a fully functional JSON parser that's probably way better than mine. I was planning to use his guide for most of the project but it quickly went over my head. What was useful to me was his Show instance definition for JValue. I haven't written one of those before so that was very handy to use. Although it isn't actually needed for the program to work, it was good for debugging.
+
+Stack Overflow question on eliminating duplicate subsequent characters:
+-- https://stackoverflow.com/questions/36746690/removing-direct-duplicates-on-a-list
+
+ZVON Haskell Reference:
+http://zvon.org/other/haskell/Outputglobal/index.html
+
+This was a great resource that documents the builtin functions. I used it to help me understand how to use the `takeWhile` and `dropWhile` functions and others.
