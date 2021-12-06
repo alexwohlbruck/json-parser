@@ -120,7 +120,7 @@ This parser is not a complete implementation of the JSON specification. For exam
 
 Doing this project I have learned a great deal about Haskell itself and the general theory of lanugage parsing, which is something I have never tried before.
 
-# Sources
+## Sources
 
 Language parsing from scratch using Haskell:
 https://abhinavsarkar.net/posts/json-parsing-from-scratch-in-haskell/
