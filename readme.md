@@ -17,7 +17,46 @@ ghc parser.hs
 
 2. Run the program, passing the input and output file names
 ```bash
-./parser example.json output.yaml
+./parser input_file.json output_file.yaml
+```
+
+## Example
+
+```bash
+./parser example.json example.yaml
+```
+example.json:
+```json
+{
+  "parent": {
+    "child": 1,
+    "test": true,
+    "subarray": [
+      "hello",
+      "world",
+      "Alex Wohlbruck"
+    ]
+  },
+  "array": [
+    1,
+    2,
+    3
+  ]
+}
+```
+example.yaml (output):
+```yaml
+parent:
+  child: 1
+  test: true
+  subarray: 
+    - "hello"
+    - "world"
+    - "Alex Wohlbruck"
+array: 
+  - 1
+  - 2
+  - 3
 ```
 
 ## Code structure
