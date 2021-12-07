@@ -1,0 +1,104 @@
+[
+  {
+    "status": {
+      "verified": null,
+      "sentCount": 0
+    },
+    "_id": "5fd56ce6b3fb8b0017357172",
+    "type": "cat",
+    "deleted": false,
+    "user": "5fd56c8db3fb8b0017357163",
+    "text": "Cats can jump up to six times their length",
+    "__v": 0
+  },
+  {
+    "status": {
+      "verified": null,
+      "sentCount": 0
+    },
+    "_id": "618ee83827d5e70263bba3c1",
+    "user": "618ee2bd27d5e70263bba175",
+    "text": "C.",
+    "type": "cat",
+    "deleted": false,
+    "__v": 0
+  },
+  {
+    "status": {
+      "verified": null,
+      "sentCount": 0
+    },
+    "_id": "619a126690c09bc73c9109c3",
+    "user": "60962b7703586f0017f63929",
+    "text": "Cats are good.",
+    "type": "cat",
+    "deleted": false,
+    "__v": 0
+  },
+  {
+    "status": {
+      "verified": null,
+      "sentCount": 0
+    },
+    "_id": "6161eab5b5401f0017b61bfc",
+    "type": "cat",
+    "deleted": false,
+    "user": "6161eaa6b5401f0017b61bf8",
+    "text": "Meow.",
+    "__v": 0
+  },
+  {
+    "status": {
+      "verified": true,
+      "sentCount": 1
+    },
+    "_id": "5b49110d0508220014ccfe91",
+    "user": "5a9ac18c7478810ea6c06381",
+    "text": "Issac Newton decided to invent the cat flap because his own cat Spithead kept opening the door and spoiling his light experiments.",
+    "deleted": false,
+    "source": "user",
+    "__v": 0,
+    "type": "cat",
+    "used": false
+  },
+  {
+    "status": {
+      "verified": null,
+      "sentCount": 0
+    },
+    "_id": "5fd56d18b3fb8b001735717c",
+    "type": "cat",
+    "deleted": false,
+    "user": "5fd56c8db3fb8b0017357163",
+    "text": "Spaying and neutering can extend a cats life. The Banfield Pet Hospital study found that neutered males live an average of 62 percent longer than unneutered cats and spayed females live an average of 39 percent longer than unspayed cats.",
+    "__v": 0
+  },
+  {
+    "status": {
+      "verified": true,
+      "sentCount": 1
+    },
+    "_id": "5c470572a99c3f00140fe4bd",
+    "user": "5c470492a99c3f00140fe4bc",
+    "text": "Cats like being brushed by their owners because it reminds them of their mother.",
+    "deleted": false,
+    "type": "cat",
+    "source": "user",
+    "__v": 0,
+    "used": false
+  },
+  {
+    "status": {
+      "verified": true,
+      "sentCount": 1
+    },
+    "_id": "591f9894d369931519ce35c6",
+    "__v": 0,
+    "text": "All cats need taurine in their diet to avoid blindness. Cats must also have fat in their diet as they are unable to produce it on their own.",
+    "source": "api",
+    "type": "cat",
+    "deleted": false,
+    "used": false,
+    "user": "5a9ac18c7478810ea6c06381"
+  }
+]

@@ -1,6 +1,5 @@
-import System.Environment (getArgs) -- [from source 1]
+import System.Environment (getArgs)
 import System.IO (IOMode (ReadMode), hGetContents, hClose, openFile)
-import Control.Monad (when)
 
 import Data.List (intercalate)
 import Data.List.Split (splitOn)
@@ -273,16 +272,16 @@ indent n = replicate (n*2) ' '
 
 --- User IO prompts ---
 
-getFiles :: [String] -> (String, String)
-getFiles [] = error "Error: No files provided."
-getFiles [i] = error "Error: No output file provided."
-getFiles [i, o] = (i, o)
-getFiles (i : o : xs) = error "Error: Too many files provided."
+getArgs' :: [String] -> (String, String)
+getArgs' [] = error "Error: No files provided."
+getArgs' [i] = error "Error: No output file provided."
+getArgs' [i, o] = (i, o)
+getArgs' (i : o : xs) = error "Error: Too many files provided."
 
 main :: IO ()
 main = do
   args <- getArgs
-  let (infile, outfile) = getFiles args
+  let (infile, outfile) = getArgs' args
 
   file <- openFile infile ReadMode
   text <- hGetContents file
